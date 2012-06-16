@@ -19,14 +19,7 @@ if ($user) {
 		$since_dt = new DateTime();
 		$since = $since_dt->getTimestamp();
 		$user_profile = $facebook->api("/$uid",'GET');
-		echo "User Profile<br />\n";
-	    print_r($user_profile);
-
-		//$likes = $facebook->api("/$uid/likes?since=$since",'GET');
-		$wall = $facebook->api("/$uid/feed?since=$since",'GET');
-		
-		echo "Wall<br />\n";
-	    print_r($wall);
+	    //print_r($user_profile);
 
 		$photos_tagged = $facebook->api(array('method' => 'fql.query', 'query' => "SELECT object_id, pid, src_big, caption, like_info, comment_info, modified FROM photo WHERE object_id IN (SELECT object_id FROM photo_tag WHERE subject = $uid AND created > $since)"));
 		$photos_albums = $facebook->api(array('method' => 'fql.query', 'query' => "SELECT object_id, pid, src_big, caption, like_info, comment_info, modified FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner = $uid AND (created > $since OR modified > $since)) AND (created > $since)"));
@@ -48,23 +41,10 @@ if ($user) {
 		usort( $photos, 'photo_compare' );
 
 		$photo_comments = array();
-		$max_photos = count($photos) > 6 ? 6 : count($photos);
+		$max_photos = count($photos) > 10 ? 10 : count($photos);
 		for ($i = 0; $i < $max_photos; $i++) {
 			$object_id = $photos[$i]['object_id'];
-			$photo_comments[$object_id] = $facebook->api(array('method' => 'fql.query', 'query' => "SELECT fromid, time, text, likes, comments FROM comment WHERE object_id = $object_id")); // lookup photo comments
-			foreach ( $photo_comments[$object_id] as $key => $value ){
-				$fromid = $photo_comments[$object_id][$key]['fromid'];
-				$name = $facebook->api(array('method' => 'fql.query', 'query' => "SELECT name FROM profile WHERE id = $fromid")); // lookup name
-				$photo_comments[$object_id][$key]['name'] = $name[0]['name'];
-			}
-
 			echo '<img src="'.$photos[$i]['src_big'].'" />Caption: '.$photos[$i]['caption'].' Likes: '.$photos[$i]['like_count'].' Comments: '.$photos[$i]['comment_count'].' Modified: '.$photos[$i]['modified'].'<br />';
-			echo "Comments<br />\n";
-			print_r($photo_comments[$object_id][$key]);
-			echo 'Name: '.$photo_comments[$object_id][$key]['name'].' Text: '.$photo_comments[$object_id][$key]['text'].' Time: '.$photo_comments[$object_id][$key]['time'].' Likes: '.$photo_comments[$object_id][$key]['likes']."<br />\n";
-			echo 'Additional Comments:';
-			print_r($photo_comments[$object_id][$key]['comments']);
-			echo "<br />\n";
 		}
 	}
 	catch (FacebookApiException $e) {
