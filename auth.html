@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Facebook App Authentication</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+		<script>
+			function facebookEnsureInit(callback) {
+				if(!window.fbApiInit) {
+					setTimeout(function(){facebookEnsureInit(function(){callback()})}, 100);
+				} else {
+					if(callback) {
+						callback();
+					}
+				}
+			}
+
+			function facebookAuthorize(callback) {
+				FB.getLoginStatus(function(response) {
+					if (response.authResponse) { // logged in
+						callback(response);
+					}
+					else {
+						FB.login(function(response) { // authorized
+							if (response.authResponse) {
+								callback(response);
+							}
+						}, {scope: 'user_about_me, user_photos, publish_stream, offline_access'});
+					}
+				});
+			}
+
+			window.fbAsyncInit = function() {
+				FB.init({
+					appId      : '319544974795592',
+					status     : true, // check login status
+					cookie     : true, // enable cookies to allow the server to access the session
+					oauth      : true, // enable OAuth 2.0
+					xfbml      : false  // parse XFBML
+				});
+				FB.getLoginStatus(function(response) {
+					fbApiInit = true;
+				});
+			};
+
+			// Load the Facebook SDK Asynchronously
+			(function(d){
+			var js, id = 'facebook-jssdk'; if (d.getElementById(id)) {return;}
+			js = d.createElement('script'); js.id = id; js.async = true;
+			js.src = "//connect.facebook.net/en_US/all.js";
+			d.getElementsByTagName('head')[0].appendChild(js);
+			}(document));
+
+			$(document).ready(function() {
+				facebookEnsureInit(function(){
+					facebookAuthorize(function(response){
+						$('#accesstoken').html('Access Token: ' + response.authResponse.accessToken);
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="fb-root"></div>
+		<div id="accesstoken"></div>
+	</body>
+</html>
