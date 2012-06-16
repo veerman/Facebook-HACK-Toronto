@@ -3,14 +3,15 @@
 require 'php-sdk/src/facebook.php';
 include realpath($_SERVER['DOCUMENT_ROOT']).'/db.php';
 
-//header('P3P: CP="CAO PSA OUR"');
-//header('Content-type: application/json');
+header('P3P: CP="CAO PSA OUR"');
+header('Content-type: application/json');
 
 $facebook = new Facebook(array(
   'appId'  => '319544974795592',
   'secret' => '24e6ef1bd7bc0de78835c2ee79546be2',
 ));
 
+$result = array('uid' => '0');
 $user = $facebook->getUser();
 if ($user) {
 	try{
@@ -51,15 +52,18 @@ if ($user) {
 		}
 		
 		insertRSS($uid,mysql_real_escape_string($rss));
+		$result['uid'] = $uid;
+		$result['message'] = 'success';
 	}
 	catch (FacebookApiException $e) {
-		echo '<pre>'.htmlspecialchars(print_r($e, true)).'</pre>';
-		$user = null;
+		$result['message'] = htmlspecialchars(print_r($e, true));
 	}
 }
 else{
-	echo 'Token error';	
+	$result['message'] = 'Token error';
 }
+
+echo json_encode($result);
 
 function insertRSS($uid,$rss){
 	$sql = "UPDATE `slideshow` SET `rss` = '$rss', `date_modified` = NOW() WHERE `uid` = '$uid';";

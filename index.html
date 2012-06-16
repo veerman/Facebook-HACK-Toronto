@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Facebook App Authentication</title>
+		<title>Facebook Slideshow</title>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 		<script>
 			function facebookEnsureInit(callback) {
@@ -33,11 +33,13 @@
 				$(document).ready(function(){
 					facebookEnsureInit(function(){
 						facebookAuthorize(function(response){
-							$('#accesstoken').html('Access Token: ' + response.authResponse.accessToken);
-							
-							//$.getJSON('generateRSS.php', function(data){
-							//	alert(data);
-							//});
+							$('#status').html('Authorized App. Generating RSS, please wait...');							
+							$.getJSON('generateRSS.php', function(data){
+								if (data['message'] == 'success')
+									$('#status').html('<a href="RSS.php?uid=' + data['uid'] + '" target="_blank">View your Facebook RSS slideshow link</a>');
+								else
+									$('#status').html(data);
+							});
 						});
 					});
 				});	
@@ -67,9 +69,10 @@
 	</head>
 	<body>
 		<div id="fb-root"></div>
+		<p>Greetings Facebook HACK Toronto!</p>
 		<form>
-			<input type="button" onclick="authorizeApp();" value="Add Slideshow App" />
+			<input type="button" onclick="authorizeApp();" value="Add Facebook Slideshow App" />
 		</form>
-		<div id="accesstoken"></div>
+		<div id="status"></div>
 	</body>
 </html>
