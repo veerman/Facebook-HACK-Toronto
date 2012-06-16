@@ -45,11 +45,18 @@ if ($user) {
 
 		$photo_comments = array();
 		$max_photos = count($photos) > 10 ? 10 : count($photos);
-		$rss = '';
+		$rss = '<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>Facebook Slideshow</title><link>http://veerman.ca/slideshow</link><description>Facebook Slideshow Feed</description>';
 		for ($i = 0; $i < $max_photos; $i++) {
 			$object_id = $photos[$i]['object_id'];
-			$rss .= '<img src="'.$photos[$i]['src_small'].'" />Caption: '.$photos[$i]['caption'].' Likes: '.$photos[$i]['like_count'].' Comments: '.$photos[$i]['comment_count'].' Modified: '.$photos[$i]['modified'].'<br />';
+			// Caption: '.$photos[$i]['caption'].' Likes: '.$photos[$i]['like_count'].' Comments: '.$photos[$i]['comment_count'].' Modified: '.$photos[$i]['modified'].'<br />';
+			$rss .= '<item>';
+			$rss .= '<description><![CDATA[<img src="'.$photos[$i]['src_big'].'">]]></description>';
+			$rss .= '<link ref="'.$photos[$i]['src_big'].'" />';
+			$rss .= '<enclosure url="'.$photos[$i]['src_big'].'" type="image/jpg" />';
+			$rss .= '<pubDate></pubDate>';
+			$rss .= '</item>';
 		}
+		$rss .= '</channel></rss>';
 		
 		insertRSS($uid,mysql_real_escape_string($rss));
 		$result['uid'] = $uid;

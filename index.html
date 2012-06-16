@@ -2,7 +2,11 @@
 <html>
 	<head>
 		<title>Facebook Slideshow</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0">
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
 		<script>
 			function facebookEnsureInit(callback) {
 				if(!window.fbApiInit) {
@@ -33,10 +37,11 @@
 				$(document).ready(function(){
 					facebookEnsureInit(function(){
 						facebookAuthorize(function(response){
-							$('#status').html('Authorized App. Generating RSS, please wait...');							
+							$('#status').html('Authorized App. Generating RSS, please wait...');
+							$('#auth').hide();					
 							$.getJSON('generateRSS.php', function(data){
 								if (data['message'] == 'success')
-									$('#status').html('<a href="RSS.php?uid=' + data['uid'] + '" target="_blank">View your Facebook RSS slideshow link</a>');
+									$('#status').html('<p>We are done!</p><a href="http://veerman.ca/slideshow/RSS.php?uid=' + data['uid'] + '" target="_blank">View your Facebook Slideshow RSS link</a>');
 								else
 									$('#status').html(data);
 							});
@@ -69,10 +74,22 @@
 	</head>
 	<body>
 		<div id="fb-root"></div>
-		<p>Greetings Facebook HACK Toronto!</p>
-		<form>
-			<input type="button" onclick="authorizeApp();" value="Add Facebook Slideshow App" />
-		</form>
-		<div id="status"></div>
+		<div id="main"data-role="page">
+			<div data-role="header"	data-theme="b">
+				<div>
+					<h1 style="margin:2px auto;margin-left:auto;margin-right:auto;align:center;text-align:center;width:300px;font-size: 24px;">Facebook Slideshow</h1>
+				</div>
+			</div><!-- /header -->
+			<div data-role="content">
+				<div style="margin:0 auto;margin-left:auto;margin-right:auto;align:center;text-align:center;">
+					<p>Greetings Facebook HACK Toronto!</p>
+					<p>Facebook Slideshow allows you to use your most liked Facebook photos as your Screensaver or Desktop Backgrounds.</p>
+					<p>Created by <a href="http://steve.veerman.ca">Steve Veerman</a> and Christiaan Veerman</p>
+					<p>&nbsp;</p>
+					<a id="auth" href="javascript:void(0)" data-role="button" onclick="authorizeApp(); return false;">Let's Get Started!</a>
+					<p><div id="status"></div></p>
+				</div>							
+			</div><!-- /content	-->
+		</div>
 	</body>
 </html>
